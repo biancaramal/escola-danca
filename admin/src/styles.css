@@ -1,0 +1,30 @@
+/* You can add global styles to this file, and also import other style files */
+a.text-light{
+  vertical-align: middle;
+}
+
+i.fas.fa-arrow-left{
+  font-size: 13px;
+}
+
+h1 i.fas.fa-key{
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+@media (min-width: 1200px){
+  .appnavbar{
+    width: 100%;
+    position: relative;
+  }
+  .panel-content{
+    width: 78%;
+    padding: 2%;
+    position: relative;
+    left: 20%;
+  }
+}
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

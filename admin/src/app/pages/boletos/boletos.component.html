@@ -1,0 +1,314 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-8 col-7">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a routerLink="/administrativo/perfil"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active" aria-current="page">Boletos</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-lg-4 col-5 text-right">
+          <a (click)="openView(2, null)" class="btn btn-sm btn-neutral">Adicionar</a>
+          <!-- <a href="#" class="btn btn-sm btn-neutral">Filtros</a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <!-- Listar -->
+  <ng-container *ngIf="openViewAction === 1" class="row">
+    <div class="col">
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header border-0">
+          <h3 class="mb-0">Boletos</h3>
+        </div>
+        <!-- Light table -->
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" matSort class="table align-items-center table-flush">
+            <ng-container matColumnDef="referencia">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Referência</th>
+              <td mat-cell *matCellDef="let row"> {{row.reference}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="cod">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Código</th>
+              <td mat-cell *matCellDef="let row"> {{row.cod | slice:0:17}}...</td>
+            </ng-container>
+
+            <ng-container matColumnDef="modalidade">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Modalidade</th>
+              <td mat-cell *matCellDef="let row"> {{row.modalidade}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="usuario">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Usuário</th>
+              <td mat-cell *matCellDef="let row"> {{row.user}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Status</th>
+              <td mat-cell *matCellDef="let row"> {{row.status}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort"></th>
+              <td mat-cell *matCellDef="let row" class="text-right">
+                <div class="dropdown">
+                  <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                    <a (click)="openView(3, row.id)" class="dropdown-item item-edit">
+                      <i class="fas fa-edit"></i>
+                      <span>Editar</span>
+                    </a>
+                    <a (click)="openModalDelete(row.id)" class="dropdown-item item-delete">
+                      <i class="fas fa-trash"></i>
+                      <span>Deletar</span>
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayed"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayed;"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="4">Sem dados cadastrados.</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Card footer -->
+        <div class="card-footer py-4">
+          <mat-paginator
+            [pageSizeOptions]="pageSizeOptions"
+            >
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!--  Adicionar -->
+  <ng-container *ngIf="openViewAction === 2" class="row">
+    <div class="col p-0">
+      <div class="card shadow">
+        <div class="card-header border-0">
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <h3 class="mb-0">Adicionar Boleto</h3>
+                </div>
+                <div class="col-4 text-right">
+                    <a (click)="openView(1, null)" class="btn btn-sm btn-primary">Voltar</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="dataForm" (ngSubmit)="post()">
+            <h6 class="heading-small text-muted mb-4">Informações da Boleto</h6>
+
+            <!-- Alertas -->
+            <alert class="alert-dismiss" type="{{responseSrv.alertType}}"
+            [isOpen]="responseSrv.open"
+            [dismissible]="responseSrv.dismissible"
+            (onClosed)="responseSrv.onClosed()"
+            >
+              <ng-container *ngFor="let mensagem of responseSrv.alertResponse">
+                <strong>{{mensagem}}</strong><br />
+              </ng-container>
+            </alert>
+
+            <div class="pl-lg-3">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Referência</label>
+                    <input type="text" formControlName="reference" class="form-control" placeholder="07/21">
+                    <span class="text-warning error" *ngIf="dataForm.controls.reference.invalid">
+                      Digite uma referência válida.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Status</label>
+                    <select formControlName="status" class="form-control">
+                      <option value="" [selected]>Selecione o status do boleto...</option>
+                      <option value="Pendente">Pendente</option>
+                      <option value="Pago">Pago</option>
+                    </select>
+                    <span class="text-warning error" *ngIf="dataForm.controls.status.invalid">
+                      Selecione o tipo de contato.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Usuário</label>
+                    <select formControlName="user_id" class="form-control">
+                      <option value="" [selected]>Selecione o usuário...</option>
+                      <option *ngFor="let user of users" [value]="user.id" >{{user.name}}</option>
+                    </select>
+                    <span class="text-warning error" *ngIf="dataForm.controls.user_id.invalid">
+                      Selecione um usuário.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Modalidade</label>
+                    <select formControlName="modalidade_id" class="form-control">
+                      <option value="" [selected]>Selecione uma modalidade...</option>
+                      <option *ngFor="let modalidade of modalidades" [value]="modalidade.id">{{modalidade.name}}</option>
+                    </select>
+                    <span class="text-warning error" *ngIf="dataForm.controls.modalidade_id.invalid">
+                      Selecione uma modalidade.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Código</label>
+                    <input type="text" formControlName="cod" class="form-control" placeholder="846490000741-0 111145645646456-7 4564545541545 8 41564564545454-9">
+                    <span class="text-warning error" *ngIf="dataForm.controls.cod.invalid">
+                      Digite uma código válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" [disabled]="dataForm.invalid" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+   <!--  Editar -->
+  <ng-container *ngIf="openViewAction === 3" class="row">
+    <div class="col p-0">
+      <div class="card shadow">
+        <div class="card-header border-0">
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <h3 class="mb-0">Editar Boleto</h3>
+                </div>
+                <div class="col-4 text-right">
+                    <a (click)="openView(1, null)" class="btn btn-sm btn-primary">Voltar</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="dataForm" (ngSubmit)="update(dataGetByID.id)">
+            <h6 class="heading-small text-muted mb-4">Informações da Boleto</h6>
+
+            <!-- Alertas -->
+            <alert class="alert-dismiss" type="{{responseSrv.alertType}}"
+            [isOpen]="responseSrv.open2"
+            [dismissible]="responseSrv.dismissible"
+            (onClosed)="responseSrv.onClosed()"
+            >
+              <ng-container *ngFor="let mensagem of responseSrv.alertResponse">
+                <strong>{{mensagem}}</strong><br />
+              </ng-container>
+            </alert>
+
+            <div class="pl-lg-3" *ngIf="dataGetByID">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Referência</label>
+                    <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.reference}}</span>
+                    <input type="text" formControlName="reference" class="form-control" placeholder="07/21">
+                    <span class="text-warning error" *ngIf="dataForm.controls.reference.invalid">
+                      Digite uma referência válida.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Status</label>
+                     <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.status}}</span>
+                    <select formControlName="status" class="form-control">
+                      <option value="" [selected]>Selecione o status do boleto...</option>
+                      <option value="Pendente">Pendente</option>
+                      <option value="Pago">Pago</option>
+                    </select>
+                    <span class="text-warning error" *ngIf="dataForm.controls.status.invalid">
+                      Selecione o tipo de contato.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Usuário</label>
+                     <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.user.name}}</span>
+                    <select formControlName="user_id" class="form-control">
+                      <option value="" [selected]>Selecione o usuário...</option>
+                      <option *ngFor="let user of users" [value]="user.id" >{{user.name}}</option>
+                    </select>
+                    <span class="text-warning error" *ngIf="dataForm.controls.user_id.invalid">
+                      Selecione um usuário.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Modalidade</label>
+                     <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.modalidade.name}}</span>
+                    <select formControlName="modalidade_id" class="form-control">
+                      <option value="" [selected]>Selecione uma modalidade...</option>
+                      <option *ngFor="let modalidade of modalidades" [value]="modalidade.id">{{modalidade.name}}</option>
+                    </select>
+                    <span class="text-warning error" *ngIf="dataForm.controls.modalidade_id.invalid">
+                      Selecione uma modalidade.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Código</label>
+                     <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.cod}}</span>
+                    <input type="text" formControlName="cod" class="form-control" placeholder="846490000741-0 111145645646456-7 4564545541545 8 41564564545454-9">
+                    <span class="text-warning error" *ngIf="dataForm.controls.cod.invalid">
+                      Digite uma código válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" [disabled]="dataForm.invalid" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

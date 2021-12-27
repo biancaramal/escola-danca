@@ -1,0 +1,10 @@
+button, .box-spinner {
+    width: 100%;
+    max-height: 43px;
+}
+
+.box-spinner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

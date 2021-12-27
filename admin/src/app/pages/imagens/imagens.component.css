@@ -1,0 +1,31 @@
+button.btn.btn-success{
+  width: 50%;
+}
+
+.card-image {
+	position: relative;
+	padding: 10px;
+	background-color: #f6f9fc;
+	border-radius: 10px;
+}
+.card-image img{
+	max-width: 100%
+}
+
+.box-image-action{
+	display: flex;
+	justify-content: space-between;
+}
+
+p.data-without{
+	font-size: 14px;
+}
+
+
+.box-img{
+	width: 80px
+}
+
+.box-img img{
+	max-width: 100%;
+}

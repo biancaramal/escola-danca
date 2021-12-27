@@ -1,0 +1,309 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-8 col-7">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a routerLink="/administrativo/perfil"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active" aria-current="page">Configurações</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gerenciamento de usuários -->
+<div class="container-fluid mt--6">
+  <!-- Listar dados -->
+  <ng-container *ngIf="openViewAction === 1" class="row">
+    <div class="col p-0">
+      <div class="card shadow">
+        <div class="card-header border-0">
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <h3 class="mb-0">Usuários administradores</h3>
+                </div>
+                <div class="col-4 text-right">
+                    <a (click)="openView(2, null)" class="btn btn-sm btn-primary">Adicionar usuário</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" matSort class="table align-items-center table-flush">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Nome</th>
+              <td mat-cell *matCellDef="let row"> {{row.name}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Email</th>
+              <td mat-cell *matCellDef="let row"> {{row.email}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dt_criado">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort">Data de Criação</th>
+              <td mat-cell *matCellDef="let row"> {{row.created_at | date:"dd/MM/yy"}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="sort"></th>
+              <td mat-cell *matCellDef="let row" class="text-right">
+                <div class="dropdown">
+                  <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                    <a (click)="openView(3, row.id)" class="dropdown-item item-edit">
+                      <i class="fas fa-edit"></i>
+                      <span>Editar</span>
+                    </a>
+                    <a (click)="openModalDelete(row.id)" class="dropdown-item item-delete">
+                      <i class="fas fa-trash"></i>
+                      <span>Deletar</span>
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayed"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayed;"></tr>
+          </table>
+        </div>
+
+        <div class="card-footer py-4">
+          <mat-paginator
+            [pageSizeOptions]="pageSizeOptions"
+            >
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!--  Adicionar -->
+  <ng-container *ngIf="openViewAction === 2" class="row">
+    <div class="col p-0">
+      <div class="card shadow">
+        <div class="card-header border-0">
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <h3 class="mb-0">Adicionar Administrador</h3>
+                </div>
+                <div class="col-4 text-right">
+                    <a (click)="openView(1, null)" class="btn btn-sm btn-primary">Voltar</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="adminForm" (ngSubmit)="post()">
+            <h6 class="heading-small text-muted mb-4">Informações do usuário</h6>
+
+            <!-- Alertas -->
+            <alert class="alert-dismiss" type="{{responseSrv.alertType}}"
+            [isOpen]="responseSrv.open"
+            [dismissible]="responseSrv.dismissible"
+            (onClosed)="responseSrv.onClosed()"
+            >
+              <ng-container *ngFor="let mensagem of responseSrv.alertResponse">
+                <strong>{{mensagem}}</strong><br />
+              </ng-container>
+            </alert>
+
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Nome</label>
+                    <input type="text" formControlName="name" class="form-control" placeholder="Leonora Lima">
+                    <span class="text-warning error" *ngIf="adminForm.controls.name.invalid">
+                      Digite um nome válido.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Email</label>
+                    <input type="text" formControlName="email" class="form-control" placeholder="exemplo@gmail.com">
+                    <span class="text-warning error" *ngIf="adminForm.controls.email.invalid" autocomplete="false">
+                      Digite um e-mail válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Senha</label>
+                    <input type="password" formControlName="password" class="form-control">
+                     <span class="text-warning error" *ngIf="adminForm.controls.password.invalid" autocomplete="new-password">
+                      Para alterar, digite a senha.
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Nova Senha</label>
+                    <input type="password" formControlName="password_confirmation" class="form-control">
+                     <span class="text-warning error" *ngIf="adminForm.controls.password_confirmation.invalid" autocomplete="new-password">
+                      Para alterar, digite a senha correspondente ao campo senha.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" [disabled]="adminForm.invalid" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!--  Editar -->
+  <ng-container *ngIf="openViewAction === 3" class="row">
+    <div class="col p-0">
+      <div class="card shadow">
+        <div class="card-header border-0">
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <h3 class="mb-0">Editar Administrador</h3>
+                </div>
+                <div class="col-4 text-right">
+                    <a (click)="openView(1, null)" class="btn btn-sm btn-primary">Voltar</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="updateAdminForm" (ngSubmit)="update(dataGetByID.id)">
+            <h6 class="heading-small text-muted mb-4">Informações do usuário</h6>
+
+            <!-- Alertas -->
+            <alert class="alert-dismiss" type="{{responseSrv.alertType}}"
+            [isOpen]="responseSrv.open"
+            [dismissible]="responseSrv.dismissible"
+            (onClosed)="responseSrv.onClosed()"
+            >
+              <ng-container *ngFor="let mensagem of responseSrv.alertResponse">
+                <strong>{{mensagem}}</strong><br />
+              </ng-container>
+            </alert>
+
+            <div class="pl-lg-4" *ngIf="dataGetByID">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Nome</label>
+                    <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.name}}</span>
+                    <input type="text" formControlName="name" class="form-control" placeholder="Leonora Lima">
+                    <span class="text-warning error" *ngIf="updateAdminForm.controls.name.invalid">
+                      Digite um nome válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Email</label>
+                    <span class="value-get-id" for="input-first-name">Atual: {{dataGetByID.email}}</span>
+                    <input type="email" formControlName="email" class="form-control">
+                    <span class="text-warning error" *ngIf="updateAdminForm.controls.email.invalid" autocomplete="false">
+                      Digite um e-mail válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" [disabled]="updateAdminForm.invalid" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Redefinição de senha -->
+<div class="container-fluid mt-3">
+  <div class="row">
+    <div class="col-xl-12 order-xl-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Redefinição de senha</h3>
+            </div>
+            <div class="col-4 text-right">
+              <a routerLink="/administrativo/perfil" class="btn btn-sm btn-primary">Meu Perfil</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="dataForm" (ngSubmit)="alterarSenha()">
+            <h6 class="heading-small text-muted mb-4">Informações do usuário</h6>
+
+            <!-- Alertas -->
+            <alert class="alert-dismiss" type="{{responseSrv.alertType}}"
+            [isOpen]="responseSrv.open2"
+            [dismissible]="responseSrv.dismissible"
+            (onClosed)="responseSrv.onClosed()"
+            >
+              <ng-container *ngFor="let mensagem of responseSrv.alertResponse">
+                <strong>{{mensagem}}</strong><br />
+              </ng-container>
+            </alert>
+
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-11">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-email">Senha atual</label>
+                    <input type="password" formControlName="current_password" class="form-control" autocomplete="new-password" >
+                    <span class="text-warning error" *ngIf="dataForm.controls.current_password.invalid">
+                      Para alterar, digite a sua senha atual.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-11">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Nova senha</label>
+                    <input type="password" formControlName="password" class="form-control" autocomplete="new-password">
+                    <span class="text-warning error" *ngIf="dataForm.controls.password.invalid">
+                      Para alterar, digite uma nova senha com no mínimo 8 caracteres.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-11">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Confirmar senha</label>
+                    <input type="password" formControlName="password_confirmation" class="form-control">
+                    <span class="text-warning error" *ngIf="dataForm.controls.password_confirmation.invalid">
+                      Para alterar, digite a senha correspondente ao campo nova senha.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" [disabled]="dataForm.invalid" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

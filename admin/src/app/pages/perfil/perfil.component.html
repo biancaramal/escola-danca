@@ -1,0 +1,98 @@
+<!-- Header -->
+<div class="header pb-1 d-flex align-items-center" style="min-height: 250px; background-image: url(../assets/img/theme/bg.jpg); background-size: cover; background-position: center top;">
+  <!-- Mask -->
+  <span class="mask bg-gradient-default opacity-8"></span>
+  <!-- Header container -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="display-2 text-white">Olá, {{tokenSrv.getUser().name}}</h1>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-4 order-xl-2">
+      <div class="card card-profile">
+        <div class="row justify-content-center">
+          <div class="col-lg-3 order-lg-2">
+            <div class="card-profile-image pt-5">
+              <span class="avatar rounded-circle">
+                <i class="ni ni-single-02"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <h5 class="h3">
+              {{tokenSrv.getUser().name}}
+            </h5>
+            <div class="h5 font-weight-300">
+              <i class="ni ni-email-83 mr-2"></i>{{tokenSrv.getUser().email}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-8 order-xl-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Editar perfil </h3>
+            </div>
+            <div class="col-4 text-right">
+              <a class="btn btn-sm btn-primary" routerLink="/administrativo/configuracoes" >Configurações</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="dataForm" (ngSubmit)="update()">
+            <h6 class="heading-small text-muted mb-4">Informações do usuário</h6>
+            <!-- Alertas -->
+            <alert type="{{responseSrv.alertType}}"
+            [isOpen]="responseSrv.open"
+            [dismissible]="responseSrv.dismissible"
+            (onClosed)="responseSrv.onClosed()"
+            >
+              <ng-container *ngFor="let mensagem of responseSrv.alertResponse">
+                <strong>{{mensagem}}</strong><br />
+              </ng-container>
+            </alert>
+
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-11">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Nome</label>
+                    <input type="text" formControlName="name" class="form-control" placeholder="Leonora Lima">
+                    <span class="text-warning error" *ngIf="dataForm.controls.name.invalid">
+                      Para alterar, digite um nome válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-11">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-email">Email</label>
+                    <input type="email" formControlName="email" class="form-control" placeholder="email@exemplo.com">
+                    <span class="text-warning error" *ngIf="dataForm.controls.email.invalid">
+                      Para alterar, digite um e-mail válido.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-success">Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

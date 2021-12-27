@@ -1,0 +1,43 @@
+.custom-alert {
+  width:300px;
+}
+
+button.close{
+  outline: 0;
+}
+
+.modal-backdrop.in {
+  opacity: 0.9;
+}
+
+.modal-title{
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-no {
+  background-color: #f4516c;
+  color:white;
+}
+
+.btn-yes {
+  background-color: #23a5df;
+  color:white;
+}
+
+.btn.btn-primary, .btn.btn-danger{
+  box-shadow: 0 0 0;
+  font-size: 14px
+}
+
+@media (max-width: 381px){
+
+  button{
+    width: 100%;
+  }
+  button.btn.margin-right.pull-right{
+    margin: 0;
+    order: 2;
+    margin-bottom: 16px;
+  }
+}
